@@ -3,7 +3,7 @@ package main
 import (
 	// "fmt"
 	// "encoding/json"
-	// "bytes"
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -33,53 +33,48 @@ func TestGetAllGender(t *testing.T) {
 	assert.NotNil(t, w.Body)
 }
 
-// func TestCreateGender(t *testing.T) {
-// 	r := Router()
+func TestCreateGender(t *testing.T) {
+	r := Router()
 
-// 	body := []byte(`{
-// 		"gender_id": 100,
-// 		"gendername": "Test"
-// 	}`)
+	body := []byte(`{
+		"gender_id": 100,
+		"genderName": "TestGender"
+	}`)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/gender", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type","application/json")
+	r.ServeHTTP(w, req)
 
-// 	w := httptest.NewRecorder()
-// 	req, err := http.NewRequest(http.MethodPost, "/gender", bytes.NewBuffer(body))
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.NotNil(t, w.Body)
+
+}
+
+func TestCreateMember(t *testing.T) {
+	r := Router()
+
+	body := []byte(`{
+		"member_id": 100,
+		"FirstName": "FNTest",
+		"LastName": "LNTest",
+		"age": 22,
+		"gender_id": 100
+	}`)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/member", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type","application/json")
+	r.ServeHTTP(w, req)
 	
-// 	assert.Equal(t, http.StatusOK, w.Code)
-// 	assert.NotNil(t, w.Body)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.NotNil(t, w.Body)
 
-// }
-
-// func TestCreateMember(t *testing.T) {
-// 	r := Router()
-
-// 	body := []byte(`{
-// 		"id": 100,
-// 		"firstname": "FNTest",
-// 		"lastname": "LNTest",
-// 		"age": 22,
-// 		"gender_id": 3
-// 	}`)
-
-// 	w := httptest.NewRecorder()
-// 	req, err := http.NewRequest(http.MethodPost, "/member", bytes.NewBuffer(body))
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	r.ServeHTTP(w, req)
-	
-// 	assert.Equal(t, http.StatusOK, w.Code)
-// 	assert.NotNil(t, w.Body)
-
-// }
+}
 
 func TestGetMember(t *testing.T) {
 	r := Router()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/member/1", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/member/100", nil)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -89,19 +84,19 @@ func TestGetMember(t *testing.T) {
 func TestGetGender(t *testing.T) {
 	r := Router()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/gender/1", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/gender/100", nil)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.NotNil(t, w.Body)
 }
 
-// func TestDeleteMember(t *testing.T) {
-// 	r := Router()
-// 	w := httptest.NewRecorder()
-// 	req, _ := http.NewRequest(http.MethodDelete, "/member/100", nil)
-// 	r.ServeHTTP(w, req)
+func TestDeleteMember(t *testing.T) {
+	r := Router()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodDelete, "/member/100", nil)
+	r.ServeHTTP(w, req)
 
-// 	assert.Equal(t, http.StatusNoContent, w.Code)
-// }
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
 
