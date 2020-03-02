@@ -14,20 +14,6 @@ type Handler struct {
 	DB *gorm.DB
 }
 
-func (h *Handler) Initialize() {
-	db, err := gorm.Open("mysql", "root:z2q3wd31@tcp(127.0.0.1:3306)/db_echovue?charset=utf8&parseTime=True",)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Connected!!!")
-	}
-
-	db.AutoMigrate(&Member{}, &Gender{})
-	db.Model(&Member{}).AddForeignKey("gender_id", "gender(gender_id)", "CASCADE", "CASCADE")
-	db.Model(&Gender{}).AddIndex("index_gender_id_name", "gender_id", "genderName")
-	h.DB = db
-}
-
 type Member struct {
 	MemberID	uint   `gorm:"primary_key" json:"member_id"`
 	FirstName 	string `gorm:"not null" json:"firstName,omitempty"`
@@ -40,6 +26,21 @@ type Member struct {
 type Gender struct {
 	GenderID	uint   `gorm:"primary_key" json:"gender_id"`
 	GenderName 	string `json:"genderName"`
+}
+
+func (h *Handler) Initialize() {
+	db, err := gorm.Open("mysql", "root:z2q3wd31@tcp(127.0.0.1:3306)/db_echovue?charset=utf8&parseTime=True&loc=Local",)
+	if err != nil {
+		fmt.Println(err)
+	} 
+	// else {
+	// 	fmt.Println("Connected!!!")
+	// }
+
+	db.AutoMigrate(&Member{}, &Gender{})
+	// db.Model(&Member{}).AddForeignKey("gender_id", "gender(gender_id)", "CASCADE", "CASCADE")
+	// db.Model(&Gender{}).AddIndex("index_gender_id_name", "gender_id", "genderName")
+	h.DB = db
 }
 
 func (h *Handler) GetAllMember(c echo.Context) error {
@@ -143,7 +144,33 @@ func (h *Handler) UpdateMember(c echo.Context) error {
 	return c.JSON(http.StatusOK, member)
 }
 
+// func main() {
+// 	e := echo.New()
+// 	e.Use(middleware.CORS())
+
+// 	h := Handler{}
+// 	h.Initialize()
+
+// 	e.GET("/member", h.GetAllMember)
+// 	e.GET("/member/:id", h.GetMember)
+// 	e.GET("/gender", h.GetAllGender)
+// 	e.GET("/gender/:id", h.GetGender)
+// 	e.POST("/member", h.AddMember)
+// 	e.POST("/gender", h.AddGender)
+// 	e.DELETE("/member/:id", h.DeleteMember)
+// 	e.PUT("/member/:id", h.UpdateMember)
+
+// 	e.Logger.Fatal(e.Start(":1323"))
+
+// }
+
 func main() {
+	r := Router()
+
+	r.Logger.Fatal(r.Start(":1323"))
+}
+
+func Router() *echo.Echo{
 	e := echo.New()
 	e.Use(middleware.CORS())
 
@@ -159,5 +186,5 @@ func main() {
 	e.DELETE("/member/:id", h.DeleteMember)
 	e.PUT("/member/:id", h.UpdateMember)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	return e
 }
